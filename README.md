@@ -1,7 +1,3 @@
-## 前言
-
-最近由于项目中使用到https的流媒体视频，使用ijkplayer进行播放时报了"Protocol not found"的异常，去项目的Issues里面查找了下，发现是ijkplayer默认不支持https，不过官方已经提供好了编译脚本，需要自己手动编译集成，下面是编译过程，以及遇到的一些坑。
-
 ## 编译环境
 
 - OS: Xubuntu 20.04-LTS
@@ -79,15 +75,6 @@ ln -s module-default.sh module.sh #完整版
 ln -s module-lite.sh module.sh #精简版
 ln -s module-lite-hevc.sh module.sh #包含HEVC的精简版
 ```
-禁用掉linux-perf（不禁用掉会提示，后面编译会报错"./libavutil/timer.h:38:31: fatal error: linux/perf_event.h: No such file or directory"）
-```
-#此处对应上面选择的编译类型的脚本
-vim module-default.sh 
-
-# 在文件的最后加入下面的代码
-export COMMON_FF_CFG_FLAGS="$COMMON_FF_CFG_FLAGS --disable-linux-perf"
-export COMMON_FF_CFG_FLAGS="$COMMON_FF_CFG_FLAGS --disable-bzlib"
-```
 
 开始编译
 ```
@@ -107,58 +94,8 @@ cd ..
 
 ## 运行ijkplayer-example
 
-1.升级gradle版本（新版本AndroidStudio必须要升级，否则会报："Gradle sync failed: Unsupported method: SyncIssue.getMultiLineMessage()"）
-```
-修改android/ijkplayer/build:gradle文件
-classpath 'com.android.tools.build:gradle:4.1.1'
-
-修改android/ijkplayer/gradle/wrapper/gradle-wrapper.properties文件
-distributionUrl=https\://services.gradle.org/distributions/gradle-6.5-all.zip
-```
-2.增加flavor Dimension（新版gradle要求每个flavor必须要有一个Dimension）
-```
-修改android/ijkplayer/ijkplayer-example/build:gradle文件
-
-flavorDimensions "platform"
-productFlavors {
-	all32 {
-		dimension "platform"
-		minSdkVersion 9
-	}
-	all64 {
-		dimension "platform"
-		minSdkVersion 21
-	}
-}
-```
-
-3.增加google()依赖仓库（不添加会报错"Could not find com.android.tools.build:aapt2:4.1.1-6503028"）
-```
-修改android/ijkplayer/build:gradle文件
-buildscript {
-    repositories {
-        google()	//添加google()依赖仓库
-        jcenter()
-    }
-}
-
-allprojects {
-    repositories {
-        google()	//添加google()依赖仓库
-        jcenter()
-    }
-}
-```
-至此，AndroidStudio应该可以顺利的编译并运行ijkplayer-example，可以连上手机进行测试
+打开AndroidStudio 打开 android/ijkplayer，运行ijkplayer-example，可以连上手机进行测试
 ```
 要注意的是，需要看下自己的手机CPU架构是32位还是64位，并进行variant的切换
 ```
 ![切换变体](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9fd84740b1f747399fbc96374e33c1df~tplv-k3u1fbpfcp-watermark.image)
-
-编译好的项目地址：
-
-https://github.com/U2tzJTNE/ijkplayer/tree/latest
-
-最后，附上demo运行成功的截图
-
-![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c00999f1d4aa4ff78704d82aebae1278~tplv-k3u1fbpfcp-watermark.image)
